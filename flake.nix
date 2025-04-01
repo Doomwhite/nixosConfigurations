@@ -14,6 +14,7 @@
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
     secrets = builtins.fromJSON (builtins.readFile "${self}/secrets.json");
+    assert (builtins.isString secrets && builtins.match ".*github_pat_.*" secrets != null);
   in
   {
     nixosConfigurations.nixos-wsl = nixpkgs.lib.nixosSystem {
@@ -95,6 +96,7 @@
                       preloadindex = true;
                       fscache = true;
                       defaultbranch = "main";
+		      editor = "nvim";
                     };
                     fetch = {
                       prune = true;
