@@ -14,7 +14,6 @@
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
     secrets = builtins.fromJSON (builtins.readFile "${self}/secrets.json");
-    assert (builtins.isString secrets && builtins.match ".*github_pat_.*" secrets != null);
   in
   {
     nixosConfigurations.nixos-wsl = nixpkgs.lib.nixosSystem {
@@ -25,6 +24,13 @@
 
         # Your basic system configuration
         {
+	  assertions = [
+            {
+              assertion = builtins.isString secrets.github_token && 
+                          builtins.match "(github_pat_|ghp_)[0-9a-zA-Z_]+" secrets.github_token != null;
+              message = "secrets.json must contain a valid GitHub personal access token starting with 'github_pat_' or 'ghp_'";
+            }         
+	  ];
           # Set the system state version for backward compatibility
           system.stateVersion = "24.05";
 
@@ -57,7 +63,9 @@
             useGlobalPkgs = true;
             useUserPackages = true;
 
-            users.${userName} = {              
+            users.${userName} = {
+              fonts.fontconfig.enable = true;
+                          
               home = {
                 # Set the state version for Home Manager
                 stateVersion = "22.11";
@@ -71,6 +79,7 @@
                   # Hack?
                   SHELL = "/etc/profiles/per-user/${userName}/bin/fish";
                 };
+                packages = [pkgs.ibm-plex];
               };
 
               programs = {
@@ -197,7 +206,7 @@
           nix = {
             settings = {
               # Experimental features, enables flakes
-              experimental-features = [ "nix-command" "flakes" ];
+              experimental-features = [ "nix-command" "flakes" "repl-flake" ];
 
               trusted-users = [userName];
 
