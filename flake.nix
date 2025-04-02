@@ -79,7 +79,10 @@
                   # Hack?
                   SHELL = "/etc/profiles/per-user/${userName}/bin/fish";
                 };
-                packages = [pkgs.ibm-plex];
+                packages = with pkgs; [
+                  ibm-plex
+                  tree
+                ];
               };
 
               programs = {
