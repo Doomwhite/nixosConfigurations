@@ -37,21 +37,19 @@
           # Basic system settings
           networking.hostName = "nixos-wsl";
           time.timeZone = "America/Sao_Paulo";
-          
-          # Enable Fish as the default shell
-          programs.fish.enable = true;
 
           # Idk
-          environment.pathsToLink = ["/share/fish"];
-          environment.shells = [pkgs.fish];
           environment.enableAllTerminfo = true;
 
           # Users configuration
           users.users.${userName} = {
             isNormalUser = true;
             extraGroups = [ "wheel" "docker" ];
-            shell = pkgs.fish;
             home = "/home/${userName}";
+	    # Sets the starting shell
+	    shell = pkgs.fish;
+	    # Required to run with the hm fish, otherwise it's an error
+	    ignoreShellProgramCheck = true;
           };
 
           # Enable Home Manager for managing user-level configurations
@@ -75,9 +73,7 @@
 
                 sessionVariables = {
                   EDITOR = "nvim";
-
-                  # Hack?
-                  SHELL = "/etc/profiles/per-user/${userName}/bin/fish";
+                  SHELL = pkgs.fish;
                 };
                 packages = with pkgs; [
                   ibm-plex
@@ -86,6 +82,42 @@
               };
 
               programs = {
+                fish = {
+                  enable = true;
+                  package = pkgs.fish;
+		  functions = {
+		    refresh = "source $HOME/.config/fish/config.fish";
+		  };
+                  shellAliases = {
+                    mxc = "emacsclient -c -n";
+                    pbcopy = "/mnt/c/Windows/System32/clip.exe";
+                    pbpaste = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -command 'Get-Clipboard'";
+                    explorer = "/mnt/c/Windows/explorer.exe";
+                  };
+		  shellAbbrs = {
+		    "nixhome" = "cd $HOME/nixosConfigurations";
+		    "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nixosConfigurations#nixos-wsl --verbose";
+		    ".." = "cd ..";
+		    "..." = "cd ../../";
+		    "...." = "cd ../../../";
+		    "....." = "cd ../../../../";
+		  };
+                  plugins = [
+                    {
+                      inherit (pkgs.fishPlugins.autopair) src;
+                      name = "autopair";
+                    }
+                    {
+                      inherit (pkgs.fishPlugins.done) src;
+                      name = "done";
+                    }
+                    {
+                      inherit (pkgs.fishPlugins.sponge) src;
+                      name = "sponge";
+                    }
+                  ];
+		};
+
                 git = {
                   enable = true;
                   package = pkgs.git;
