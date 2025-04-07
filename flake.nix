@@ -73,7 +73,7 @@
 
                 sessionVariables = {
                   EDITOR = "nvim";
-                  SHELL = pkgs.fish;
+                  SHELL = "${pkgs.fish}/bin/fish";
                 };
                 packages = with pkgs; [
                   ibm-plex
