@@ -6,9 +6,10 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    emacs.url = "github:Doomwhite/emacs/new";
   };
 
-  outputs = { self, nixpkgs, nixos-wsl, home-manager, ... }:
+  outputs = { self, nixpkgs, nixos-wsl, home-manager, emacs, ... }:
   let
     userName = "DooMWhite";
     system = "x86_64-linux";
@@ -24,13 +25,13 @@
 
         # Your basic system configuration
         {
-	  assertions = [
+	        assertions = [
             {
               assertion = builtins.isString secrets.github_token && 
                           builtins.match "(github_pat_|ghp_)[0-9a-zA-Z_]+" secrets.github_token != null;
               message = "secrets.json must contain a valid GitHub personal access token starting with 'github_pat_' or 'ghp_'";
             }         
-	  ];
+	        ];
           # Set the system state version for backward compatibility
           system.stateVersion = "24.05";
 
@@ -46,10 +47,10 @@
             isNormalUser = true;
             extraGroups = [ "wheel" "docker" ];
             home = "/home/${userName}";
-	    # Sets the starting shell
-	    shell = pkgs.fish;
-	    # Required to run with the hm fish, otherwise it's an error
-	    ignoreShellProgramCheck = true;
+            # Sets the starting shell
+            shell = pkgs.fish;
+            # Required to run with the hm fish, otherwise it's an error
+            ignoreShellProgramCheck = true;
           };
 
           # Enable Home Manager for managing user-level configurations
@@ -85,12 +86,10 @@
                 fish = {
                   enable = true;
                   package = pkgs.fish;
-		  functions = {
-		    refresh = "source $HOME/.config/fish/config.fish";
-		  };
+                  functions = {
+                      refresh = "source $HOME/.config/fish/config.fish";
+                  };
                   interactiveShellInit = ''
-                    ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
-                  
                     ${pkgs.lib.strings.fileContents (pkgs.fetchFromGitHub {
                         owner = "rebelot";
                         repo = "kanagawa.nvim";
@@ -107,14 +106,14 @@
                     pbpaste = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -command 'Get-Clipboard'";
                     explorer = "/mnt/c/Windows/explorer.exe";
                   };
-		  shellAbbrs = {
-		    "nixhome" = "cd $HOME/nixosConfigurations";
-		    "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nixosConfigurations#nixos-wsl --verbose";
-		    ".." = "cd ..";
-		    "..." = "cd ../../";
-		    "...." = "cd ../../../";
-		    "....." = "cd ../../../../";
-		  };
+                  shellAbbrs = {
+                      "nixhome" = "cd $HOME/nixosConfigurations";
+                      "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nixosConfigurations#nixos-wsl --verbose";
+                      ".." = "cd ..";
+                      "..." = "cd ../../";
+                      "...." = "cd ../../../";
+                      "....." = "cd ../../../../";
+                  };
                   plugins = [
                     {
                       inherit (pkgs.fishPlugins.autopair) src;
@@ -129,7 +128,7 @@
                       name = "sponge";
                     }
                   ];
-		};
+		            };
 
                 git = {
                   enable = true;
@@ -153,7 +152,7 @@
                       preloadindex = true;
                       fscache = true;
                       defaultbranch = "main";
-		      editor = "nvim";
+		                  editor = "nvim";
                     };
                     fetch = {
                       prune = true;
@@ -231,6 +230,10 @@
                   };
                 };
                 neovim.enable = true;
+                emacs = {
+                  enable = true;
+                  package = emacs.packages.${system}.default;
+                };
               };
             };
           };
