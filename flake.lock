@@ -6,11 +6,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1744373664,
-        "narHash": "sha256-wf6TzDvIbp9zcytYZzWl+lIhzakkJ0TrOsXYYltYEZY=",
+        "lastModified": 1744398459,
+        "narHash": "sha256-EYRK/cyhyaFQrsMb0Jmc9EmpAsNMxDo8pjLMdkD1Cvw=",
         "owner": "Doomwhite",
         "repo": "emacs",
-        "rev": "cb2cc37b85014338c9e878dc00b237c487203394",
+        "rev": "87f3d59b0fe45a52fa82a4bf020bdcf93d7720e0",
         "type": "github"
       },
       "original": {

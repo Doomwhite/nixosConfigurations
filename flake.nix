@@ -9,14 +9,19 @@
     emacs.url = "github:Doomwhite/emacs/new";
   };
 
-  outputs = { self, nixpkgs, nixos-wsl, home-manager, emacs, ... }:
-  let
+  outputs = {
+    self,
+    nixpkgs,
+    nixos-wsl,
+    home-manager,
+    emacs,
+    ...
+  }: let
     userName = "DooMWhite";
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
     secrets = builtins.fromJSON (builtins.readFile "${self}/secrets.json");
-  in
-  {
+  in {
     nixosConfigurations.nixos-wsl = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
@@ -25,13 +30,14 @@
 
         # Your basic system configuration
         {
-	        assertions = [
+          assertions = [
             {
-              assertion = builtins.isString secrets.github_token && 
-                          builtins.match "(github_pat_|ghp_)[0-9a-zA-Z_]+" secrets.github_token != null;
+              assertion =
+                builtins.isString secrets.github_token
+                && builtins.match "(github_pat_|ghp_)[0-9a-zA-Z_]+" secrets.github_token != null;
               message = "secrets.json must contain a valid GitHub personal access token starting with 'github_pat_' or 'ghp_'";
-            }         
-	        ];
+            }
+          ];
           # Set the system state version for backward compatibility
           system.stateVersion = "24.05";
 
@@ -45,7 +51,7 @@
           # Users configuration
           users.users.${userName} = {
             isNormalUser = true;
-            extraGroups = [ "wheel" "docker" ];
+            extraGroups = ["wheel" "docker"];
             home = "/home/${userName}";
             # Sets the starting shell
             shell = pkgs.fish;
@@ -64,7 +70,7 @@
 
             users.${userName} = {
               fonts.fontconfig.enable = true;
-                          
+
               home = {
                 # Set the state version for Home Manager
                 stateVersion = "22.11";
@@ -73,12 +79,13 @@
                 homeDirectory = "/home/${userName}";
 
                 sessionVariables = {
-                  EDITOR = "nvim";
+                  EDITOR = "emacsclient -c -n";
                   SHELL = "${pkgs.fish}/bin/fish";
                 };
                 packages = with pkgs; [
                   ibm-plex
                   tree
+                  nix-your-shell
                 ];
               };
 
@@ -87,9 +94,11 @@
                   enable = true;
                   package = pkgs.fish;
                   functions = {
-                      refresh = "source $HOME/.config/fish/config.fish";
+                    refresh = "source $HOME/.config/fish/config.fish";
                   };
                   interactiveShellInit = ''
+                    nix-your-shell fish | source
+
                     ${pkgs.lib.strings.fileContents (pkgs.fetchFromGitHub {
                         owner = "rebelot";
                         repo = "kanagawa.nvim";
@@ -97,7 +106,7 @@
                         sha256 = "sha256-f/CUR0vhMJ1sZgztmVTPvmsAgp0kjFov843Mabdzvqo=";
                       }
                       + "/extras/kanagawa.fish")}
-                  
+
                     set -U fish_greeting
                   '';
                   shellAliases = {
@@ -107,12 +116,12 @@
                     explorer = "/mnt/c/Windows/explorer.exe";
                   };
                   shellAbbrs = {
-                      "nixhome" = "cd $HOME/nixosConfigurations";
-                      "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nixosConfigurations#nixos-wsl --verbose";
-                      ".." = "cd ..";
-                      "..." = "cd ../../";
-                      "...." = "cd ../../../";
-                      "....." = "cd ../../../../";
+                    "nixhome" = "cd $HOME/nixosConfigurations";
+                    "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nixosConfigurations#nixos-wsl --verbose";
+                    ".." = "cd ..";
+                    "..." = "cd ../../";
+                    "...." = "cd ../../../";
+                    "....." = "cd ../../../../";
                   };
                   plugins = [
                     {
@@ -128,7 +137,7 @@
                       name = "sponge";
                     }
                   ];
-		            };
+                };
 
                 git = {
                   enable = true;
@@ -152,7 +161,7 @@
                       preloadindex = true;
                       fscache = true;
                       defaultbranch = "main";
-		                  editor = "nvim";
+                      editor = "emacsclient -c -n";
                     };
                     fetch = {
                       prune = true;
@@ -235,6 +244,27 @@
                   package = emacs.packages.${system}.default;
                 };
               };
+              # services.emacs = {
+              #   enable = true;
+              #   package = emacs.packages.${system}.default;
+              # };
+
+systemd.user.services.emacs = {
+  Unit = {
+    Description = "Emacs foreground daemon";
+  };
+  Install = {
+    WantedBy = [ "default.target" ];
+  };
+  Service = {
+    Type = "simple";
+    Environment = "PATH=${pkgs.git}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin";
+    ExecStartPre = "/bin/sh -c 'echo ExecStart: ${emacs.packages.${system}.default}/bin/emacs --fg-daemon >> /tmp/emacs-service.log; which emacs >> /tmp/emacs-service.log'";
+    ExecStart = "${emacs.packages.${system}.default}/bin/emacs --fg-daemon";
+    ExecStop = "${emacs.packages.${system}.default}/bin/emacsclient --eval '(kill-emacs)'";
+    Restart = "on-failure";
+  };
+};
             };
           };
 
@@ -257,7 +287,7 @@
           nix = {
             settings = {
               # Experimental features, enables flakes
-              experimental-features = [ "nix-command" "flakes" "repl-flake" ];
+              experimental-features = ["nix-command" "flakes" "repl-flake"];
 
               trusted-users = [userName];
 
