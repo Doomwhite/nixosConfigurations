@@ -7,6 +7,9 @@
     home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     emacs.url = "github:Doomwhite/emacs/new";
+    emacs.inputs.nixpkgs.follows = "nixpkgs";
+    alejandra.url = "github:kamadorueda/alejandra/4.0.0";
+    # alejandra.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {
@@ -15,6 +18,7 @@
     nixos-wsl,
     home-manager,
     emacs,
+    alejandra,
     ...
   }: let
     userName = "DooMWhite";
@@ -86,6 +90,7 @@
                   ibm-plex
                   tree
                   nix-your-shell
+                  alejandra.defaultPackage.${system}
                 ];
               };
 
@@ -244,27 +249,11 @@
                   package = emacs.packages.${system}.default;
                 };
               };
-              # services.emacs = {
-              #   enable = true;
-              #   package = emacs.packages.${system}.default;
-              # };
 
-systemd.user.services.emacs = {
-  Unit = {
-    Description = "Emacs foreground daemon";
-  };
-  Install = {
-    WantedBy = [ "default.target" ];
-  };
-  Service = {
-    Type = "simple";
-    Environment = "PATH=${pkgs.git}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin";
-    ExecStartPre = "/bin/sh -c 'echo ExecStart: ${emacs.packages.${system}.default}/bin/emacs --fg-daemon >> /tmp/emacs-service.log; which emacs >> /tmp/emacs-service.log'";
-    ExecStart = "${emacs.packages.${system}.default}/bin/emacs --fg-daemon";
-    ExecStop = "${emacs.packages.${system}.default}/bin/emacsclient --eval '(kill-emacs)'";
-    Restart = "on-failure";
-  };
-};
+              services.emacs = {
+                enable = true;
+                package = emacs.packages.${system}.default;
+              };
             };
           };
 
