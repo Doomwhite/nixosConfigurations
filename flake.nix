@@ -86,10 +86,10 @@
                   EDITOR = "emacsclient -c -n";
                   SHELL = "${pkgs.fish}/bin/fish";
                 };
-                packages = with pkgs; [
-                  ibm-plex
-                  tree
-                  nix-your-shell
+                packages = [
+                  pkgs.ibm-plex
+                  pkgs.tree
+                  pkgs.nix-your-shell
                   alejandra.defaultPackage.${system}
                 ];
               };

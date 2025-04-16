@@ -29,11 +29,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1744642829,
-        "narHash": "sha256-Lcor24KvELa7UEqvTKvXUUNQvW35Yh7IFRb+ROCMqBA=",
+        "lastModified": 1744836420,
+        "narHash": "sha256-GCqqCWDtKNhFd03Ck/vt+rauaANAmgn+xhZh/+0BX24=",
         "owner": "Doomwhite",
         "repo": "emacs",
-        "rev": "14d06f100ccbc05a33ed907b5bf5fbbdde4fc2e5",
+        "rev": "c8b70efccfd6f5c4033dcabf9fae35d1aa28e77a",
         "type": "github"
       },
       "original": {
