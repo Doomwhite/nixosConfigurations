@@ -11,7 +11,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
       name = "backup_recycle_bin";
   in 
-  {
+  rec {
       packages.${system}.default = pkgs.stdenv.mkDerivation {
           name = name;
           src = ./.;
@@ -36,6 +36,11 @@
             mkdir -p $out
             cp -r $PWD/zig-out/bin $out/bin
           '';
+      };
+
+      apps.${system}.default = {
+        type = "app";
+        program = "${packages.${system}.default}/bin/backup_recycle_bin";
       };
   };
 }
