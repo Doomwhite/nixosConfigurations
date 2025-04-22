@@ -1,6 +1,5 @@
 # Structure
 - angular/: Angular dev env (shell.nix).
-- core: Nix core examples.
 - flake.nix, flake.lock: Main Flake files.
 - guides/: Practical how-tos.
 - nix-projects/: Hands-on projects for experimentation.
@@ -12,7 +11,7 @@
 
 # How to use
 
-- Get the [latest release](https://github.com/LGUG2Z/nixos-wsl-starter/releases)
+Get the [latest release](https://github.com/LGUG2Z/nixos-wsl-starter/releases)
 
 ```bash
 wsl --import NixOS .\NixOS\ .\nixos-wsl.tar.gz --version 2
