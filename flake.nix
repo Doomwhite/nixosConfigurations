@@ -104,6 +104,7 @@
 
               programs = {
                 neovim.enable = true;
+
                 emacs = {
                   enable = true;
                   package = emacs.packages.${system}.default;

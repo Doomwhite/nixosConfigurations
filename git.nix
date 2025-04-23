@@ -1,4 +1,8 @@
-{ pkgs, secrets, ... }: {
+{
+  pkgs,
+  secrets,
+  ...
+}: {
   programs.git = {
     enable = true;
     package = pkgs.git;
