@@ -8,6 +8,8 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     emacs.url = "github:Doomwhite/emacs/new";
     emacs.inputs.nixpkgs.follows = "nixpkgs";
+    calcula-horas.url = "github:Doomwhite/calcula-horas";
+    calcula-horas.inputs.nixpkgs.follows = "nixpkgs";
     alejandra.url = "github:kamadorueda/alejandra/4.0.0";
   };
 
@@ -17,6 +19,7 @@
     nixos-wsl,
     home-manager,
     emacs,
+    calcula-horas,
     alejandra,
     ...
   }: let
@@ -99,6 +102,7 @@
                   alejandra.defaultPackage.${system}
                   pkgs.dolphin
                   pkgs.xorg.xeyes
+                  calcula-horas.packages.${system}.default
                 ];
               };
 
