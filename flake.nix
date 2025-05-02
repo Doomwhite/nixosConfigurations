@@ -96,6 +96,7 @@
                   SHELL = "${pkgs.fish}/bin/fish";
                 };
                 packages = [
+                  pkgs.ripgrep
                   pkgs.ibm-plex
                   pkgs.tree
                   pkgs.nix-your-shell
