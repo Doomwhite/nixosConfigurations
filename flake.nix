@@ -65,10 +65,16 @@
             LC_TIME = "en_US.UTF-8";
           };
 
-          services.displayManager.sddm.enable = true;
+          # services.displayManager.sddm.enable = true;
+          services.displayManager.defaultSession = "cinnamon";
+          services.libinput.enable = true;
           services.xserver = {
             enable = true;
-            desktopManager.plasma5.enable = true;
+            displayManager.lightdm.enable = true;
+            desktopManager = {
+              cinnamon.enable = true;
+            };
+            # desktopManager.plasma5.enable = true;
             xkb = {
               layout = "us";
               variant = "";
@@ -105,6 +111,7 @@
           environment.systemPackages = with pkgs; [
             neovim
             wget
+            cinnamon.mint-themes
           ];
 
           system.stateVersion = "24.11";
@@ -248,34 +255,14 @@
                   + "/extras/kanagawa.fish")}
 
                 set -U fish_greeting
-
-                echo "Checking for ip command..."
-                if command -v ip >/dev/null 2>&1
-                    # Use ip route
-                    set ip (ip route show | grep default | awk '{print $3}')
-                    # Create DISPLAY and PULSE_SERVER variables
-                    set -x DISPLAY "$ip:0.0"
-                    set -x PULSE_SERVER "tcp:$ip"
-
-                    echo "Using ip route with ip $ip"
-                else
-                    # Otherwise, we use windows ipconfig
-                    set ip (ipconfig.exe | grep -A 10 "vEthernet (WSL (Hyper-V firewall))" | grep "IPv4 Address" | sed -E 's/.*: ([0-9.]+)/\1/')
-
-                    # Create DISPLAY and PULSE_SERVER variables
-                    set -x DISPLAY "$ip:0.0"
-                    set -x PULSE_SERVER "tcp:$ip"
-
-                    echo "Using ipconfig with ip $ip"
-                end
               '';
               shellAliases = {
                 mx = "emacs";
                 mxc = "emacsclient -c -n";
               };
               shellAbbrs = {
-                "nixhome" = "cd $HOME/nix-config";
-                "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nix-config --verbose";
+                "nixhome" = "cd $HOME/nixosConfigurations";
+                "nixbuild" = "sudo nixos-rebuild switch --flake $HOME/nixosConfigurations --verbose";
                 ".." = "cd ..";
                 "..." = "cd ../../";
                 "...." = "cd ../../../";
